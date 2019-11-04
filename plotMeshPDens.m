@@ -44,6 +44,10 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     colorBarLabel='density (m^{-3})';
     zScale = [];
     firstElementAdjust=0;
+    plotEdges = 0;
+    removeZeros = 1;
+    faceAlpha = 0.3;
+    bgColour=[0.6 0.6 0.6];
 
     for i = 1:2:length(varargin) % only bother with odd arguments, i.e. the labels
         switch varargin{i}
@@ -71,6 +75,14 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
                 zScale = varargin{i+1};
             case 'firstElementIndex'
                 firstElementAdjust = varargin{i+1};
+            case 'plotEdges'
+                plotEdges = varargin{i+1};
+            case 'removeZeros'
+                removeZeros = varargin{i+1};
+            case 'FaceAlpha'
+                faceAlpha = varargin{i+1};
+            case 'BackgroundColour'
+                bgColour = varargin{i+1}; 
         end
     end
     
@@ -89,11 +101,10 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     col=0.6;
     
     if (add==0)
-        f1=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',0,'FaceColor',[col col col]);
+        f1=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',0,'FaceColor',bgColour);
 
-        plotEdges=0;
         if plotEdges==1
-            set(f1,'EdgeColor','k','FaceAlpha',0.3)
+            set(f1,'EdgeColor',[0.7 0.7 0.7],'FaceAlpha',0.3)
         else
             set(f1,'EdgeColor','none','FaceAlpha',0.3)
         end
@@ -101,30 +112,35 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
         
     if ~isempty(meshdens)
         
-        % Distances above are in m. So areas are in m^2.
-        % NOTE: areas are always calculated using the OS coordinates, as these
-        % are in metres
-        x = [mesh.nodexy_os(mesh.trinodes(:,1),1) mesh.nodexy_os(mesh.trinodes(:,2),1) mesh.nodexy_os(mesh.trinodes(:,3),1)];
-        y = [mesh.nodexy_os(mesh.trinodes(:,1),2) mesh.nodexy_os(mesh.trinodes(:,2),2) mesh.nodexy_os(mesh.trinodes(:,3),2)];
-        area = 0.5*abs((x(:,1)-x(:,3)).*(y(:,2)-y(:,1))-(x(:,1)-x(:,2)).*(y(:,3)-y(:,1)));
-        % Debugging
-        %fprintf('element areas');
-        %min(area)
-        %max(area)
-    
         if firstElementAdjust==1
             meshdens=[0,meshdens(1:(end-1))];
         end
         
         if (areaScale==1)
-            z=meshdens./area;
+            % Distances above are in m. So areas are in m^2.
+            % NOTE: areas are always calculated using the OS coordinates, as these
+            % are in metres
+            x = [mesh.nodexy_os(mesh.trinodes(:,1),1) mesh.nodexy_os(mesh.trinodes(:,2),1) mesh.nodexy_os(mesh.trinodes(:,3),1)];
+            y = [mesh.nodexy_os(mesh.trinodes(:,1),2) mesh.nodexy_os(mesh.trinodes(:,2),2) mesh.nodexy_os(mesh.trinodes(:,3),2)];
+            area = 0.5*abs((x(:,1)-x(:,3)).*(y(:,2)-y(:,1))-(x(:,1)-x(:,2)).*(y(:,3)-y(:,1)));
+            % Debugging
+            %fprintf('element areas');
+            %min(area)
+            %max(area)
+            z=meshdens./area;            
         else
             z=meshdens;
+            area=ones(length(meshdens),1);
+        end
+        
+        if (removeZeros==1)
+            z(z==0)=nan;
         end
 
-        % Only plot non-zero patches
-        z(z==0)=nan;
         out=[meshdens(~isnan(z)), area(~isnan(z)), z(~isnan(z))];
+        
+        
+        %z
         
         % Debugging
         %fprintf('density values');
@@ -140,13 +156,14 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
             f2=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',z,'FaceColor','flat');
         end
         %set(f2,'EdgeColor','none','FaceAlpha',0)
-        set(f2,'EdgeColor','none','FaceAlpha',0.5)
+        set(f2,'EdgeColor','none','FaceAlpha',faceAlpha)
         
         z2=z(uvnode(:,1)>xl(1) & uvnode(:,1)<xl(2) & uvnode(:,2)>yl(1) & uvnode(:,2)>xl(2));
         % Debugging
         %size(z2)
         %max(z2)
-        
+    else
+        warning('meshdens not present, or mis-specified Name parameter in arguments');
     end
 
     hold on

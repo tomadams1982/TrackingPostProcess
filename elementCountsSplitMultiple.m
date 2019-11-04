@@ -1,4 +1,4 @@
-function [counts,sourceCounts] = elementCounts(mesh,locationsDir,startDate,endDate,varargin)
+function [counts,sourceCounts] = elementCountsSplitMultiple(mesh,locationsDir,startDate,endDate,varargin)
 %function [counts,sourceCounts] = elementCounts(mesh,locationsDir,startDate,endDate,extension,startTime,endTime,status,locationsToCount,scaling)
 % ELEMENTCOUNTS  count the hours that each model element is occupied by a
 % particle during a set time window (optionally scaled by recorded density)

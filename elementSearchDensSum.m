@@ -105,6 +105,8 @@ function [dSum,dMean,dCount] = elementSearchDensSum(locationsDir,startDate,endDa
         startOffset=0;
     end
 
+    locationsDir;
+    
     % load files for the days required
     % Check that output for the required days exists
     %locfiles=dir('locations*.out');
@@ -121,6 +123,8 @@ function [dSum,dMean,dCount] = elementSearchDensSum(locationsDir,startDate,endDa
             end
         end
     end
+    
+    pLocations';
     
     % Here, pLocations is a cell array of filenames
     dsLocations = datastore(pLocations,'Type','tabulartext','FileExtensions',extension,'ReadVariableNames',1);

@@ -25,7 +25,7 @@ function [distHist,dists,percentileDist] = dispersalHistFromDensity(mesh,density
 % Author: Thomas Adams, SAMS, 2019
 
     histInterval = 5000;
-    maxDist = 50000;
+    maxDist = 80000;
     percentile = 95;
 
     for i = 1:2:length(varargin) % only bother with odd arguments, i.e. the labels
@@ -72,7 +72,9 @@ function [distHist,dists,percentileDist] = dispersalHistFromDensity(mesh,density
     percentileInd=find(csum<(percentile/100)*sum(values),1,'last');
     percentileDist=d2(percentileInd);
  
+    size(dists)
+    
     %disp(['histSum = ' num2str(sum(distHist(:,2))) ' ' num2str(sum(values))]);
-    %disp(['Percentile dist = ' num2str(percentileDist)]);
+    disp(['Percentile dist = ' num2str(percentileDist)]);
     
 end

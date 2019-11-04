@@ -77,6 +77,7 @@ function plotConnect(connectMatrix,siteLocations,varargin)
         [row,col]=find(connectMatrix>minThreshold);
     else
         [row,col]=find(~isinf(log10(connectMatrix)));
+        %[row,col]=find(log10(connectMatrix)>minThreshold);
     end
     
     for r=1:size(row,1)
@@ -94,19 +95,10 @@ function plotConnect(connectMatrix,siteLocations,varargin)
         if (val>maxThreshold)
             val=maxThreshold;
         end
-        if (val<minThreshold)
-            val=minThreshold;
-        end
-        
-        % Scale the value onto [0:1]. This will mean that: 
-        % - The minimum threshold is displayed black
-        % - The maximum threshold is displayed red
-        val = (val-minThreshold)/(maxThreshold-minThreshold);
-        %disp(['transformed value 2 = ' num2str(val)]);
-        
-        p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'Color',[val,0,0],'LineWidth',lineWidth);
-        %p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'-k','LineWidth',linewidth);
-        
+        %if (val<minThreshold)
+            %val=minThreshold;
+        %end
+               
         x1=double(siteLocations(row(r),1));
         x2=double(siteLocations(col(r),1));
         y1=double(siteLocations(row(r),2));
@@ -130,7 +122,25 @@ function plotConnect(connectMatrix,siteLocations,varargin)
         x0          = x2*cs + y2*ss;                                % build head coordinates
         y0          = -x2*ss + y2*cs;
         coords      = R*[x0 x0+head_width/2 x0-head_width/2; y0 y0-head_length y0-head_length];
-        patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[val 0 0],'EdgeColor',[val 0 0]);
+        
+        
+        if (val>minThreshold)
+            % Scale the value onto [0:1]. This will mean that: 
+            % - The minimum threshold is displayed black
+            % - The maximum threshold is displayed red
+            val = (val-minThreshold)/(maxThreshold-minThreshold);
+            %disp(['transformed value 2 = ' num2str(val)]);
+
+            p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'Color',[val,0,0],'LineWidth',lineWidth);
+            %p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'-k','LineWidth',linewidth);
+            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[val 0 0],'EdgeColor',[val 0 0]);
+        else
+            % Value below the minimum threshold - plot a dashed black line
+            p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'--k');
+            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[0 0 0],'EdgeColor',[0 0 0],'FaceAlpha',0);
+        end
+        
+        
     end
     
     if (colorBar==1)
