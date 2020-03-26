@@ -48,6 +48,8 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     removeZeros = 1;
     faceAlpha = 0.3;
     bgColour=[0.6 0.6 0.6];
+    minZ=[];
+    cMap=[];
 
     for i = 1:2:length(varargin) % only bother with odd arguments, i.e. the labels
         switch varargin{i}
@@ -71,6 +73,8 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
                 colorBar = varargin{i+1};
             case 'colorBarLabel'
                 colorBarLabel = varargin{i+1};
+            case 'cMap'
+                cMap = varargin{i+1};
             case 'zScale'
                 zScale = varargin{i+1};
             case 'firstElementIndex'
@@ -83,8 +87,16 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
                 faceAlpha = varargin{i+1};
             case 'BackgroundColour'
                 bgColour = varargin{i+1}; 
+            case 'minZ'
+                minZ = varargin{i+1}; 
         end
     end
+    
+    if ~isempty(cMap)
+        colormap(cMap);
+    end
+        
+        
     
     % Work out element areas for scaling
     if (os==1)
@@ -103,6 +115,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     if (add==0)
         f1=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',0,'FaceColor',bgColour);
 
+        
         if plotEdges==1
             set(f1,'EdgeColor',[0.7 0.7 0.7],'FaceAlpha',0.3)
         else
@@ -150,13 +163,18 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
              
         % plot the mesh data, only for those cells with non-zero values
 
-        if (logScale==1)
+        if ~isempty(minZ)
+            z(z<minZ)=nan;
+        end
+        
+        if logScale==1
             f2=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',log10(z),'FaceColor','flat');
         else
             f2=patch('Vertices',nodexy,'Faces',mesh.trinodes,'FaceVertexCdata',z,'FaceColor','flat');
         end
+        
         %set(f2,'EdgeColor','none','FaceAlpha',0)
-        set(f2,'EdgeColor','none','FaceAlpha',faceAlpha)
+        set(f2,'EdgeColor','none','FaceAlpha',faceAlpha);
         
         z2=z(uvnode(:,1)>xl(1) & uvnode(:,1)<xl(2) & uvnode(:,2)>yl(1) & uvnode(:,2)>xl(2));
         % Debugging

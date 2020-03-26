@@ -20,6 +20,7 @@ function plotConnect(connectMatrix,siteLocations,varargin)
     os=1;
     colorBar=0; % Should a colorbar be added?
     logScale=0;
+    alphaV=1;
     
     % Not presently used; always added to an empty pDens plot
 %     xl = [0,0];
@@ -42,6 +43,8 @@ function plotConnect(connectMatrix,siteLocations,varargin)
                 logScale =  varargin{i+1};
             case 'zScale'
                 zScale = varargin{i+1};
+            case 'alphaV'
+                alphaV = varargin{i+1};
 %             case 'xl'
 %                 xl = varargin{i+1};
 %             case 'yl'
@@ -82,15 +85,16 @@ function plotConnect(connectMatrix,siteLocations,varargin)
     
     for r=1:size(row,1)
         %val=connectMatrix2(row(r),col(r));
+
         val=connectMatrix2(row(r),col(r));
         %disp(['raw value = ' num2str(val)]);
-        
-        
+
+
         if (logScale==1)
             val=log10(val);
         end
         %disp(['transformed value 1 = ' num2str(val)]);
-        
+
         % Fix the maximum value to be plotted
         if (val>maxThreshold)
             val=maxThreshold;
@@ -98,7 +102,7 @@ function plotConnect(connectMatrix,siteLocations,varargin)
         %if (val<minThreshold)
             %val=minThreshold;
         %end
-               
+
         x1=double(siteLocations(row(r),1));
         x2=double(siteLocations(col(r),1));
         y1=double(siteLocations(row(r),2));
@@ -116,14 +120,14 @@ function plotConnect(connectMatrix,siteLocations,varargin)
             head_length=0.015;
             head_width=0.015;
         else
-            head_length=2000;
-            head_width=2000;
+            head_length=1000;
+            head_width=1000;
         end
         x0          = x2*cs + y2*ss;                                % build head coordinates
         y0          = -x2*ss + y2*cs;
         coords      = R*[x0 x0+head_width/2 x0-head_width/2; y0 y0-head_length y0-head_length];
-        
-        
+
+
         if (val>minThreshold)
             % Scale the value onto [0:1]. This will mean that: 
             % - The minimum threshold is displayed black
@@ -131,16 +135,17 @@ function plotConnect(connectMatrix,siteLocations,varargin)
             val = (val-minThreshold)/(maxThreshold-minThreshold);
             %disp(['transformed value 2 = ' num2str(val)]);
 
-            p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'Color',[val,0,0],'LineWidth',lineWidth);
+            p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],...
+                'Color',[val,0,0],'LineWidth',lineWidth);
+            p.Color(4)=alphaV;
             %p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'-k','LineWidth',linewidth);
-            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[val 0 0],'EdgeColor',[val 0 0]);
+            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[val 0 0],'EdgeColor',[val 0 0],'FaceAlpha',alphaV,'EdgeAlpha',0);
         else
             % Value below the minimum threshold - plot a dashed black line
             p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'--k');
-            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[0 0 0],'EdgeColor',[0 0 0],'FaceAlpha',0);
+            p.Color(4)=alphaV;
+            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[0 0 0],'EdgeColor',[0 0 0],'FaceAlpha',0,'EdgeAlpha',alphaV);
         end
-        
-        
     end
     
     if (colorBar==1)

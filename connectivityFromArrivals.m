@@ -57,7 +57,7 @@ function [connectivity,partDens,partIDs] = connectivityFromArrivals(directory,si
         {'vector'}, ...
         mfilename, 'the startDate', 2)
     if endDate<startDate
-        error('connectivityFromArrivals.m: endDate supplied (arg 3) was not later startDate (agr 2)');
+        error('connectivityFromArrivals.m: endDate supplied (arg 3) was not later than startDate (arg 2)');
     end
 %     validateattributes(endDate, {'double'}, ...
 %         {'>=',startDate,'vector', 'real', 'nonnan', 'finite'}, ...
@@ -111,6 +111,7 @@ function [connectivity,partDens,partIDs] = connectivityFromArrivals(directory,si
         % option 1 - loop over rows in data
         if (1==1)
             for i=1:size(locationDataChunk,1)
+                %fprintf([num2str(i) '\n'])
                 fromID=find(ismember(siteIDs,locationDataChunk.startLocation{i}));
                 %locationDataChunk.startLocation{i};
                 toID=find(ismember(siteIDs,locationDataChunk.endLocation{i}));
@@ -125,6 +126,9 @@ function [connectivity,partDens,partIDs] = connectivityFromArrivals(directory,si
                 % prevent the same particle arriving multiple times at the
                 % same site
                 if (~isempty(fromID) && ~isempty(toID))
+                    %size(connectParts)
+                    % **** If fails here, check start IDs is a column
+                    % vector! ***
                     if ~ismember(pID,connectParts{fromID,toID})
                         val=locationDataChunk.density(i)/nparts;
                         %fprintf('from %s (%d) to %s (%d) val %f\n',locationDataChunk.startLocation{i},from,locationDataChunk.endLocation{i},to,val); 

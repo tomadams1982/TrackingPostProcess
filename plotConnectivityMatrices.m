@@ -28,6 +28,8 @@ function plotConnectivityMatrices(connectivity,siteLocations,varargin)
         end
     end
     
+    logOnly
+    
     nColours=length(logScale(1):logScale(2));
     
     if linearOnly==1
@@ -95,7 +97,7 @@ function plotConnectivityMatrices(connectivity,siteLocations,varargin)
 
         set(gca,'Ydir','Normal')
         cb1=colorbar;
-        cb1.Label.String = 'ln_{10}(P(connection))';
+        cb1.Label.String = 'log_{10}(P(connection))';
         xlabel('destination site')
         xticks(1:length(names))
         xticklabels(names)
