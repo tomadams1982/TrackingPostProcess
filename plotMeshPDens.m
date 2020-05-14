@@ -1,5 +1,5 @@
 function [out,z2] = plotMeshPDens(mesh,varargin)
-% PLOTMESHPDENSSIMPLE  plot an FVCOM model mesh. The plot can include some 
+% PLOTMESHPDENS  plot an FVCOM model mesh. The plot can include some 
 % kind of density information (specified in "meshDensity"), site location points
 % (specified in "startLocations"). Various options are available, depending
 % on the plot that is desired, see Arguments.
@@ -14,14 +14,15 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
 %                       projected coordinate system in metres) (=1) or to
 %                       be in degrees (long/lat) (=0)
 %                   logScale: logical, is density information to be
-%                       plotted on a logarithmic scale
-%                   xl
-%                   yl
-%                   add
-%                   areaScale
-%                   colorBar
-%                   colorBarLabel
-%                   zScale
+%                       plotted on a logarithmic scale?
+%                   xl: x limits
+%                   yl: y limits
+%                   add: logical, add to existing plot?
+%                   areaScale: logical, is density information to be
+%                       scaled by element area?
+%                   colorBar: logical, display a colorbar?
+%                   colorBarLabel: logical, display a colorbar label?
+%                   zScale: limits for z range
 %                   firstElementIndex: Allow switching between Java/C 
 %                       arrays (first index 0) and Matlab/R arrays (first 
 %                       index 1)
@@ -35,7 +36,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     startlocs = [];
     xl = [0,0];
     yl = [0,0];
-    os = 1;
+    os = 2;
     logScale = 0;
     filename = 'noprint';
     add=0;
@@ -55,6 +56,10 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
         switch varargin{i}
             case 'meshDensity'
                 meshdens = varargin{i+1};
+            case 'meshDensitySparse'
+                meshDensSparse = varargin{i+1};
+                meshdens = zeros(size(mesh.uvnode,1),1);
+                meshdens(meshDensSparse(:,1)+1) = meshDensSparse(:,2);
             case 'startLocations'
                 startlocs = varargin{i+1};
             case 'os'
@@ -88,7 +93,8 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
             case 'BackgroundColour'
                 bgColour = varargin{i+1}; 
             case 'minZ'
-                minZ = varargin{i+1}; 
+                minZ = varargin{i+1};
+            
         end
     end
     
