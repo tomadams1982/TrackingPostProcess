@@ -127,7 +127,8 @@ function [counts,sourceCounts] = elementCounts(mesh,locationsDir,startDate,endDa
         dsLocations = datastore(pLocations,'Type','tabulartext','FileExtensions',extension,'ReadVariableNames',1);
         dsLocations.Delimiter = ' ';
         dsLocations.NumHeaderLines = 0;
-        dsLocations.TextscanFormats = {'%d','%d','%{yyyyMMdd}D','%f','%s','%f','%f','%d','%d','%f'};
+        %dsLocations.TextscanFormats = {'%d','%d','%{yyyyMMdd}D','%f','%s','%f','%f','%d','%d','%f'};
+        dsLocations.TextscanFormats = {'%d','%d','%{yyyyMMdd}D','%f','%s','%f','%f','%d','%d','%f','%d','%f','%f'};
         dsLocations.ReadSize= 500000;
         dsLocations.SelectedVariableNames = {'startLocation','elem','status','density'};
 

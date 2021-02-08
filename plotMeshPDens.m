@@ -1,4 +1,4 @@
-function [out,z2] = plotMeshPDens(mesh,varargin)
+function [out,z2,cb1] = plotMeshPDens(mesh,varargin)
 % PLOTMESHPDENS  plot an FVCOM model mesh. The plot can include some 
 % kind of density information (specified in "meshDensity"), site location points
 % (specified in "startLocations"). Various options are available, depending
@@ -47,7 +47,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
     firstElementAdjust=0;
     plotEdges = 0;
     removeZeros = 1;
-    faceAlpha = 0.3;
+    faceAlpha = 0.8;
     bgColour=[0.6 0.6 0.6];
     minZ=[];
     cMap=[];
@@ -60,6 +60,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
                 meshDensSparse = varargin{i+1};
                 meshdens = zeros(size(mesh.uvnode,1),1);
                 meshdens(meshDensSparse(:,1)+1) = meshDensSparse(:,2);
+                %find(meshdens)
             case 'startLocations'
                 startlocs = varargin{i+1};
             case 'os'
@@ -165,7 +166,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
         %fprintf('density values');
         %min(z)
         %max(z)
-        %size(find(z>10))
+        %size(find(~isnan(z)))
              
         % plot the mesh data, only for those cells with non-zero values
 
@@ -197,7 +198,7 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
         scatter(startlocs(:,1),startlocs(:,2),20,'filled')
     end
 
-    if (colorBar==1)
+    if (colorBar>0)
         % Sort out the colorbar based on provided thresholds
         if (logScale==0)
             if isempty(zScale)
@@ -206,8 +207,13 @@ function [out,z2] = plotMeshPDens(mesh,varargin)
                 caxis(zScale);
             end
             %colormap(cmap)
-            cb1 = colorbar('Position',[.87 .13 .05 .77]);
-            cb1.Label.String = colorBarLabel;
+            if colorBar==1
+                cb1 = colorbar('Position',[.87 .13 .05 .77]);
+                cb1.Label.String = colorBarLabel;
+            elseif colorBar==2
+                cb1 = colorbar('Position',[.90 .13 .03 .77]);
+                cb1.Label.String = colorBarLabel;
+            end
         else
             if isempty(zScale)
                 caxis([-8 1.5]);

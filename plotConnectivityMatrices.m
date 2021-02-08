@@ -44,7 +44,15 @@ function plotConnectivityMatrices(connectivity,siteLocations,varargin)
     mx=1;
     
     %names=startlocs.SEPA_Site(I);
-    names=siteLocations.SEPA_Site(I);
+    if strcmp(class(siteLocations),'cell')
+        names=siteLocations;
+    elseif any(strcmp('SEPA_Site', siteLocations.Properties.VariableNames))
+        names=siteLocations.SEPA_Site(I);
+    elseif any(strcmp('Var1', siteLocations.Properties.VariableNames))
+        names=siteLocations.Var1;
+    else
+        names={I};
+    end
 
     vals1=mean(connectivity(I,I,startInd:endInd),3)/mx;
     vals2=log10(mean(connectivity(I,I,startInd:endInd),3));

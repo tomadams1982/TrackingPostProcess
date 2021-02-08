@@ -15,6 +15,8 @@ function plotConnect(connectMatrix,siteLocations,varargin)
     zScale = [];
     minThreshold = 0;
     maxThreshold = 1;
+    
+    cutoffMin = -10;
         
     lineWidth=2;
     os=1;
@@ -29,6 +31,12 @@ function plotConnect(connectMatrix,siteLocations,varargin)
 
     for i = 1:2:length(varargin) % only bother with odd arguments, i.e. the labels
         switch varargin{i}
+            case 'logScale'
+                logScale =  varargin{i+1};
+                if (logScale==1)
+                    minThreshold = -5;
+                    maxThreshold = 0;
+                end
             case 'minThreshold'
                 minThreshold = varargin{i+1};
             case 'maxThreshold'
@@ -39,8 +47,7 @@ function plotConnect(connectMatrix,siteLocations,varargin)
                 lineWidth = varargin{i+1};
             case 'colorBar'
                 colorBar =  varargin{i+1};
-            case 'logScale'
-                logScale =  varargin{i+1};
+            
             case 'zScale'
                 zScale = varargin{i+1};
             case 'alphaV'
@@ -51,13 +58,11 @@ function plotConnect(connectMatrix,siteLocations,varargin)
 %                 yl = varargin{i+1};
 %             case 'add'
 %                 add = varargin{i+1};
+            case 'cutoffMin'
+                cutoffMin = varargin{i+1};
         end
     end
-    
-    if (logScale==1)
-        minThreshold = -5;
-        maxThreshold = 0;
-    end
+    warning('***If specifying logScale and thresholds, ensure thresholds are specified after logscale***');
     if ~isempty(zScale)
         minThreshold = zScale(1);
         maxThreshold = zScale(2);
@@ -116,9 +121,9 @@ function plotConnect(connectMatrix,siteLocations,varargin)
         ss          = sin(teta);
         R           = [cs -ss;ss cs];
         %line_length = sqrt( (y2-y1)^2 + (x2-x1)^2 );                % sizes
-        if (os==0)
-            head_length=0.015;
-            head_width=0.015;
+        if (os==0 || os==2)
+            head_length=0.02;
+            head_width=0.02;
         else
             head_length=1000;
             head_width=1000;
@@ -142,9 +147,11 @@ function plotConnect(connectMatrix,siteLocations,varargin)
             patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[val 0 0],'EdgeColor',[val 0 0],'FaceAlpha',alphaV,'EdgeAlpha',0);
         else
             % Value below the minimum threshold - plot a dashed black line
-            p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'--k');
-            p.Color(4)=alphaV;
-            patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[0 0 0],'EdgeColor',[0 0 0],'FaceAlpha',0,'EdgeAlpha',alphaV);
+            if (val>cutoffMin)
+                p=plot([siteLocations(row(r),1) siteLocations(col(r),1)],[siteLocations(row(r),2) siteLocations(col(r),2)],'--k');
+                p.Color(4)=alphaV;
+                patch(coords(1,:),coords(2,:),[0 0 0],'FaceColor',[0 0 0],'EdgeColor',[0 0 0],'FaceAlpha',0,'EdgeAlpha',alphaV);
+            end
         end
     end
     
